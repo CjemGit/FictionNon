@@ -1,0 +1,146 @@
+Restored session: Sat 25 Nov 2017 20:18:16 EST
+Clements-MacBook-Pro:~ clementmanger$ cd /Users/clementmanger/Desktop
+Clements-MacBook-Pro:Desktop clementmanger$ ls -al
+total 1754552
+drwx------+ 17 clementmanger  staff        544 26 Nov 07:22 .
+drwxr-xr-x+ 37 clementmanger  staff       1184 25 Nov 19:35 ..
+-rw-r--r--@  1 clementmanger  staff      10244 26 Nov 07:22 .DS_Store
+drwxr-xr-x   2 clementmanger  staff         64  2 Nov 16:07 .ipynb_checkpoints
+-rw-r--r--   1 clementmanger  staff          0 12 Aug 09:23 .localized
+-rw-r--r--@  1 clementmanger  staff      11078  2 Nov 16:07 10. Recurrant Neural Networks.ipynb
+-rw-r--r--@  1 clementmanger  staff      75491  2 Nov 16:07 11. RNN Language Examples.ipynb
+-rw-r--r--@  1 clementmanger  staff  476801062 26 Nov 06:23 Final Fantasy VII (USA) (Disc 2).7z
+-rw-r--r--@  1 clementmanger  staff  420694283 26 Nov 06:23 Final Fantasy VII (USA) (Disc 3).7z
+drwxrwxrwx   6 clementmanger  staff        192 21 Nov 09:02 Howls.Moving.Castle.2004.720p.BluRay.x264-x0r
+-rw-r--r--@  1 clementmanger  staff     728457 26 Nov 06:18 OpenEmu Playstation Bios.zip
+drwxr-xr-x   8 clementmanger  staff        256 17 Oct 13:48 T Shirt Ideas
+drwxr-xr-x   9 clementmanger  staff        288 19 Oct 16:38 Telly
+drwxr-xr-x@  9 clementmanger  staff        288 26 Nov 08:24 Thesis
+drwxrwxrwx  21 clementmanger  staff        672 16 Nov 14:18 Twin Peaks Season 1
+drwxrwxrwx  49 clementmanger  staff       1568 16 Nov 14:17 Twin Peaks Season 2
+drwxr-xr-x   4 clementmanger  staff        128 25 Nov 19:35 git
+Clements-MacBook-Pro:Desktop clementmanger$ cd Thesis/
+Clements-MacBook-Pro:Thesis clementmanger$ ls
+Bibliography	Code		Data		Tensorflow	Write Ups	~
+Clements-MacBook-Pro:Thesis clementmanger$ cd Code/
+Clements-MacBook-Pro:Code clementmanger$ ls -al
+\total 144
+drwxr-xr-x  13 clementmanger  staff   416 26 Nov 08:23 .
+drwxr-xr-x@  9 clementmanger  staff   288 26 Nov 08:24 ..
+-rw-r--r--@  1 clementmanger  staff  6148 26 Nov 08:23 .DS_Store
+-rw-r--r--@  1 clementmanger  staff  8193  6 Nov 10:24 CNNtensortest.py
+-rw-r--r--@  1 clementmanger  staff  6830 24 Nov 19:00 LSTMGloVe.py
+-rw-r--r--@  1 clementmanger  staff  8244 24 Nov 14:30 LSTMGoogleWord2Vec.py
+-rw-r--r--@  1 clementmanger  staff   632 25 Oct 12:40 Sample Editing.py
+-rw-r--r--@  1 clementmanger  staff   621 21 Nov 06:47 Vocab.py
+-rw-r--r--@  1 clementmanger  staff  3848 24 Nov 13:53 W2Vtest.py
+-rw-r--r--@  1 clementmanger  staff   772  5 Oct 09:13 concat sentences.py
+-rw-r--r--@  1 clementmanger  staff  1477 20 Nov 17:50 labeller.py
+-rw-r--r--@  1 clementmanger  staff  2117 26 Nov 08:15 stringops.py
+-rw-r--r--@  1 clementmanger  staff  4572 16 Nov 06:43 tensormessin.py
+Clements-MacBook-Pro:Code clementmanger$ touch .gitignore
+Clements-MacBook-Pro:Code clementmanger$ git init
+Initialized empty Git repository in /Users/clementmanger/Desktop/Thesis/Code/.git/
+Clements-MacBook-Pro:Code clementmanger$ git add -A
+Clements-MacBook-Pro:Code clementmanger$ git status
+On branch master
+
+Initial commit
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+
+	new file:   .gitignore
+	new file:   CNNtensortest.py
+	new file:   LSTMGloVe.py
+	new file:   LSTMGoogleWord2Vec.py
+	new file:   Sample Editing.py
+	new file:   Vocab.py
+	new file:   W2Vtest.py
+	new file:   concat sentences.py
+	new file:   labeller.py
+	new file:   stringops.py
+	new file:   tensormessin.py
+
+Clements-MacBook-Pro:Code clementmanger$ git commit -a
+[master (root-commit) c234f24] initial commit
+ Committer: Clement Manger <clementmanger@Clements-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 11 files changed, 1240 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 CNNtensortest.py
+ create mode 100644 LSTMGloVe.py
+ create mode 100644 LSTMGoogleWord2Vec.py
+ create mode 100644 Sample Editing.py
+ create mode 100644 Vocab.py
+ create mode 100644 W2Vtest.py
+ create mode 100644 concat sentences.py
+ create mode 100644 labeller.py
+ create mode 100644 stringops.py
+ create mode 100644 tensormessin.py
+Clements-MacBook-Pro:Code clementmanger$ git remote add origin https://github.com/CjemGit/FictionNon.git
+Clements-MacBook-Pro:Code clementmanger$ git push -u origin master
+Username for 'https://github.com': Cjem2nd@gmail.com
+Password for 'https://Cjem2nd@gmail.com@github.com':
+Counting objects: 13, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (12/12), done.
+Writing objects: 100% (13/13), 10.86 KiB | 2.17 MiB/s, done.
+Total 13 (delta 3), reused 0 (delta 0)
+remote: Resolving deltas: 100% (3/3), done.
+To https://github.com/CjemGit/FictionNon.git
+ * [new branch]      master -> master
+Branch master set up to track remote branch master from origin.
+Clements-MacBook-Pro:Code clementmanger$ git log
+commit c234f24f5a04c04296a6ee61b282a224bb4bd73e (HEAD -> master, origin/master)
+Author: Clement Manger <clementmanger@Clements-MacBook-Pro.local>
+Date:   Sun Nov 26 08:32:17 2017 -0500
+
+    initial commit
+Clements-MacBook-Pro:Code clementmanger$ git log --oneline
+c234f24 (HEAD -> master, origin/master) initial commit
+Clements-MacBook-Pro:Code clementmanger$ git commit
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Changes not staged for commit:
+	modified:   .gitignore
+
+no changes added to commit
+Clements-MacBook-Pro:Code clementmanger$ git commit -a -m "we edited git ignore"
+[master d85cdb1] we edited git ignore
+ Committer: Clement Manger <clementmanger@Clements-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 1 insertion(+)
+Clements-MacBook-Pro:Code clementmanger$ git push -u origin master
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 311 bytes | 311.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object
+To https://github.com/CjemGit/FictionNon.git
+   c234f24..d85cdb1  master -> master
+Branch master set up to track remote branch master from origin.
+Clements-MacBook-Pro:Code clementmanger$
