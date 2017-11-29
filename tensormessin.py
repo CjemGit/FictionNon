@@ -1,7 +1,7 @@
 import os
 
 cwd = os.getcwd()
-os.chdir('/Users/clementmanger/Desktop/Thesis/Tensorflow')
+os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
 
 import pandas as pd
 
@@ -103,7 +103,7 @@ with tf.Session() as sess:
     tf.tables_initializer().run()
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
-    # for i in range(batch_size):
+    for i in range(batch_size):
 
     # print(sess.run(tf.squeeze(label_batch)))
     # print(tf.expand_dims((example_batch), -1).shape)
@@ -113,7 +113,7 @@ with tf.Session() as sess:
     # print(tf.squeeze(labels).shape)
 
     #THIS READS FROM THE SAME
-    # print(sess.run([densewords, numbers, padded, sliced, shaped]))
+        print(sess.run([shaped]))
 
     #THESE READ FROM DIFFERENT ONES
     # print(densewords.shape)

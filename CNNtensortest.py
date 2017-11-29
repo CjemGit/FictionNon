@@ -1,33 +1,12 @@
 import os
 
 cwd = os.getcwd()
-os.chdir('/Users/clementmanger/Desktop/Thesis/Tensorflow')
+os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
 
 import pandas as pd
 
 df = pd.DataFrame.from_csv('ReviewsFiction.csv', sep = '|', header=0)
 
-
-#
-# df = df.reset_index().drop('index', axis=1)
-#
-# cols = df.columns.tolist()
-#
-# cols = cols[-1:] + cols[:-1]
-#
-# df = df[cols]
-
-#
-# from sklearn.model_selection import train_test_split
-#
-# traindf, evaldf = train_test_split(df, test_size=0.2)
-
-#you fucked up with the csvs
-
-# traindf.to_csv('train.csv', sep = '|', header=False, index=False)
-# evaldf.to_csv('eval.csv', sep = '|', header=False, index=False)
-
-#figure out document lengths
 length = []
 import nltk as nl
 for f in df['Review Text']:
@@ -65,27 +44,6 @@ vocab_processor.fit(lines)
 #       f.write("{}\n".format(word))
 N_WORDS = len(vocab_processor.vocabulary_)
 
-#check the estimator spec
-
-#we have to read the csv into tensorflow, take everything out of the function box and make sure its working
-
-#test streaming data in from csv
-#
-# with tf.Session() as sess:
-#   # Start populating the filename queue.
-#   coord = tf.train.Coordinator()
-#   threads = tf.train.start_queue_runners(coord=coord)
-#
-#   for i in range(file_len(filename)):
-#     # Retrieve a single instance:
-#     label, example = sess.run([col1, col2])
-#
-#     print(labels, features, label, example)
-#
-#   coord.request_stop()
-#   coord.join(threads)
-
-
 def train_input_fn():
 
     def file_len(fname):
@@ -115,6 +73,7 @@ def train_input_fn():
 
     return features, labels
 
+train_input_fn()
 
 def eval_input_fn():
 
@@ -215,13 +174,20 @@ def cnn_model(features, labels, mode):
             train_op=train_op,
             predictions=predictions_dict)
 
-output_dir = '/Users/clementmanger/Desktop/Thesis/Tensorflow/TFdata'
+output_dir = '/Users/clementmanger/Desktop/Thesis/Tensorflow/TFCNN'
 
 cnn = tf.estimator.Estimator(model_fn=cnn_model, config=tflearn.RunConfig(model_dir=output_dir))
 
-cnn.train(input_fn=train_input_fn, steps = 1000)
+cnn.train(input_fn=train_input_fn, steps = 500)
 
-ev = cnn.evaluate(input_fn=eval_input_fn, steps = 100)
+ev = cnn.evaluate(input_fn=eval_input_fn, steps = 5)
+
+pred = cnn.predict(input_fn=eval_input_fn)
+
+for i, p in enumerate(pred):
+
+    print("Prediction %s: %s" % (i + 1, p["prob"]))
+
 
 # print('hooray')
 

@@ -1,7 +1,8 @@
 import os
 cwd = os.getcwd()
-
 cwd
+os.chdir('/Users/clementmanger/Desktop/Thesis/Data/')
+
 import pandas as pd
 import numpy as np
 
@@ -11,9 +12,9 @@ revs = pd.read_csv('clemrevs.csv', delimiter='|', index_col=0)
 
 revs
 
-labelled = revs[revs['fiction'] == np.NaN]
+labelled = revs[revs['fiction'].notnull()]
 
-revs = revs[revs['fiction'] != np.NaN]
+revs = revs[revs['fiction'].isnull()]
 
 sample = revs.sample(int(number))
 

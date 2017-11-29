@@ -5,7 +5,7 @@ import re
 import nltk as nl
 
 cwd = os.getcwd()
-os.chdir('/Users/clementmanger/Desktop/Thesis/Tensorflow')
+os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
 
 df = pd.DataFrame.from_csv('ReviewsFiction.csv', sep = '|', header=0)
 
@@ -25,29 +25,6 @@ def removeStopWords(string):
     return filtered_sentence
 
 
-#
-# from nltk.corpus import stopwords
-#
-#
-# example_sent = "This is a sample sentence, showing off the stop words filtration."
-#
-# stop_words = set(stopwords.words('english'))
-#
-# word_tokens = word_tokenize(example_sent)
-#
-# filtered_sentence = [w for w in word_tokens if not w in stop_words]
-#
-# filtered_sentence = []
-#
-# for w in word_tokens:
-#     if w not in stop_words:
-#         filtered_sentence.append(w)
-#
-# print(word_tokens)
-# print(filtered_sentence)
-
-
-
 def cleanstring(string):
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
     string = re.sub(r"\'s", " \'s", string)
@@ -64,18 +41,37 @@ def cleanstring(string):
     string = re.sub(r"\s{2,}", " ", string)
     return string.strip().lower()
 
-from nltk import PorterStemmer
-stemmer = PorterStemmer()
+from nltk.stem.wordnet import WordNetLemmatizer
 
-def tokenise(string):
-    string = self.clean(string)
-    words = string.split(" ")
-    return ([self.stemmer.stem(word,0,len(word)-1) for word in words])
+def lemmatize(string):
+    lmtzr = WordNetLemmatizer()
+    word_tokens = word_tokenize(string)
 
-tokenise('what a ridiculous sentence I loved to thing going')
+    lemmaz = []
+    for word in word_tokens:
+        lemmaz.append(lmtzr.lemmatize(word))
+    lemmaz = ' '.join(lemmaz)
+
+    return lemmaz
+
+
+def Propernoun(string):
+    word_tokens = word_tokenize(string)
+    sent = []
+    for x in nl.pos_tag(word_tokens):
+        if x[1] == 'NNP':
+            sent.append(x[1])
+        else:
+            sent.append(x[0])
+    sent = ' '.join(sent)
+    return sent
+
+df['Review Text'] = df['Review Text'].apply(Propernoun)
 
 df['Review Text'] = df['Review Text'].apply(cleanstring)
 
 df['Review Text'] = df['Review Text'].apply(removeStopWords)
+
+df['Review Text'] = df['Review Text'].apply(lemmatize)
 
 df

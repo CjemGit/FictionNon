@@ -8,7 +8,7 @@ import tensorflow.contrib.learn as tflearn
 import tensorflow.contrib.rnn as rnn
 
 cwd = os.getcwd()
-os.chdir('/Users/clementmanger/Desktop/Thesis/Tensorflow')
+os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
 
 df = pd.DataFrame.from_csv('ReviewsFiction.csv', sep = '|', header=0)
 
@@ -20,9 +20,8 @@ for f in df['Review Text']:
 lines = df['Review Text']
 
 #model parameters
-BATCH_SIZE = 1
-EMBEDDING_SIZE = 10
-LSTM_SIZE = 3
+BATCH_SIZE = 8
+LSTM_SIZE = 12
 
 #import parameters
 TARGETS = ['True', 'False']
@@ -46,6 +45,8 @@ x = np.array(list(vocab_processor.fit_transform(lines)))
 vocabulary = vocab_processor.vocabulary_
 
 vocab_size = len(vocabulary)
+
+#try using a 'read up to' method for batching
 
 def train_input_fn():
 
@@ -81,17 +82,12 @@ def train_input_fn():
     padding = tf.constant([[0,0],[0,MAX_DOCUMENT_LENGTH]])
     padded = tf.pad(numbers, padding)
     sliced = tf.slice(padded, [0,0], [-1, MAX_DOCUMENT_LENGTH])
-    shaped = tf.reshape(sliced, [1735])
+    shaped = tf.reshape(sliced, [MAX_DOCUMENT_LENGTH])
 
-    batch_size = file_len(filename)
-    min_after_dequeue = 10000
-    capacity = min_after_dequeue + 3 * batch_size
-
-    features, labels = tf.train.shuffle_batch(
-      [shaped, labels], batch_size=batch_size, capacity=capacity,
-      min_after_dequeue=min_after_dequeue)
+    features = shaped
 
     return features, labels
+
 
 #
 # def eval_input_fn():
@@ -124,7 +120,6 @@ def train_input_fn():
 #     return features, labels
 
 #pandas can't be used because it wants feature columns, ours needs processing inside the model
-
 
 def load_embedding_vectors_word2vec(vocabulary, filename, binary):
     # load embedding_vectors from the word2vec
@@ -171,7 +166,15 @@ def load_embedding_vectors_word2vec(vocabulary, filename, binary):
 
 def RNN_model(features, labels, mode):
 
-    initW = load_embedding_vectors_word2vec(vocabulary, '/Users/clementmanger/Desktop/Thesis/Word2Vec/GoogleNews-vectors-negative300.bin', True)
+    batch_size = BATCH_SIZE
+    min_after_dequeue = 10000
+    capacity = min_after_dequeue + 3 * batch_size
+
+    features, labels = tf.train.shuffle_batch(
+      [features, labels], batch_size=batch_size, capacity=capacity,
+      min_after_dequeue=min_after_dequeue)
+
+    initW = load_embedding_vectors_word2vec(vocabulary, '/Users/clementmanger/Desktop/Thesis/Data/GoogleNews-vectors-negative300.bin', True)
 
     V = tf.Variable(tf.random_uniform([vocab_size, 300], -1.0, 1.0),name="W")
 
@@ -179,21 +182,12 @@ def RNN_model(features, labels, mode):
 
     features = tf.nn.embedding_lookup(V, features)
 
-    # features = tf.expand_dims((features), -1)
-
-    #features = tf.bitcast(features, tf.float64)
-
-    labels = tf.squeeze(labels)
+    if mode == tf.contrib.learn.ModeKeys.TRAIN or mode == tf.contrib.learn.ModeKeys.EVAL: labels = tf.squeeze(labels)
 
     seqlen = tf.placeholder(tf.int32, [features.shape[0]])
 
     lstm_cell = rnn.BasicLSTMCell(LSTM_SIZE, forget_bias=1.0)
     outputs, _ = tf.nn.dynamic_rnn(lstm_cell, features, dtype=tf.float32)
-
-    #something about this stops linear from receiving 2d arguments
-    #, sequence_length=seqlen, initial_state=[features.shape[0], LSTM_SIZE])
-
-    #static RNN requires inputs as a sequence
 
     #slice to keep only the last cell of the RNN
     outputs = outputs[:, -1]
@@ -232,8 +226,27 @@ def RNN_model(features, labels, mode):
 
 output_dir = '/Users/clementmanger/Desktop/Thesis/Tensorflow/TFGw2v'
 
-RNN = tf.estimator.Estimator(model_fn=RNN_model, config=tflearn.RunConfig(model_dir=output_dir))
+config = tflearn.RunConfig(save_summary_steps=None, save_checkpoints_steps=50, model_dir=output_dir)
 
-RNN.train(input_fn=train_input_fn, steps = 98)
+RNN = tf.estimator.Estimator(model_fn=RNN_model, config=config)
 
-# ev = RNN.evaluate(input_fn=eval_input_fn, steps = 100)
+RNN.train(input_fn=train_input_fn, steps = 100)
+
+# RNN.evaluate(input_fn=train_input_fn, steps = 1)
+
+#the input doesn't work - check what train_input_fn is yielding
+#something in the model doesn't work
+#
+# pred = RNN.predict(input_fn=train_input_fn)
+#
+# for i, p in enumerate(pred):
+#
+#     print("Prediction %s: %s" % (i + 1, p["prob"]))
+#
+#     if i == 2:
+#
+#         break
+#
+# # RNN.train(input_fn=train_input_fn, steps = 98)
+#
+# # ev = RNN.evaluate(input_fn=eval_input_fn, steps = 100)
