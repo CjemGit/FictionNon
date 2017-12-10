@@ -6,6 +6,8 @@ from tensorflow.contrib import lookup
 from tensorflow.python.platform import gfile
 import tensorflow.contrib.learn as tflearn
 import tensorflow.contrib.rnn as rnn
+import datetime
+
 
 cwd = os.getcwd()
 os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
@@ -46,7 +48,8 @@ vocabulary = vocab_processor.vocabulary_
 
 vocab_size = len(vocabulary)
 
-#try using a 'read up to' method for batching
+#try using a 'read up to' method for batching, batching should be done by the input function
+#try using different learning rates
 
 def train_input_fn():
 
@@ -189,6 +192,8 @@ def RNN_model(features, labels, mode):
     lstm_cell = rnn.BasicLSTMCell(LSTM_SIZE, forget_bias=1.0)
     outputs, _ = tf.nn.dynamic_rnn(lstm_cell, features, dtype=tf.float32)
 
+#pair it down as much as possible
+
     #slice to keep only the last cell of the RNN
     outputs = outputs[:, -1]
 
@@ -200,20 +205,28 @@ def RNN_model(features, labels, mode):
 
     logits = tf.matmul(outputs, W) + b
 
+    correctPred = tf.equal(tf.argmax(logits,1), tf.argmax(labels,1))
+    accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
+    tf.summary.scalar('accuracy', accuracy)
+
     predictions_dict = {
       'Fiction': tf.gather(TARGETS, tf.argmax(logits, 1)),
       'prob': tf.nn.softmax(logits)
     }
 
     #for softmax cross entropy, logits and labels must have same dimensionality, this means the logits must be the same as batch size
-
+    #try changing these learning parameters
     if mode == tf.contrib.learn.ModeKeys.TRAIN or mode == tf.contrib.learn.ModeKeys.EVAL:
        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels))
+
+       tf.summary.scalar('loss', loss)
+
        train_op = tf.contrib.layers.optimize_loss(
          loss,
          tf.contrib.framework.get_global_step(),
          optimizer='Adam',
-         learning_rate=0.01)
+
+         learning_rate=0.001)
     else:
        loss = None
        train_op = None
@@ -224,13 +237,18 @@ def RNN_model(features, labels, mode):
             train_op=train_op,
             predictions=predictions_dict)
 
+
 output_dir = '/Users/clementmanger/Desktop/Thesis/Tensorflow/TFGw2v'
+
+merged = tf.summary.merge_all()
 
 config = tflearn.RunConfig(save_summary_steps=None, save_checkpoints_steps=50, model_dir=output_dir)
 
 RNN = tf.estimator.Estimator(model_fn=RNN_model, config=config)
 
 RNN.train(input_fn=train_input_fn, steps = 100)
+
+#tensorboard --logdir='/Users/clementmanger/Desktop/Thesis/Tensorflow/TFGw2v'
 
 # RNN.evaluate(input_fn=train_input_fn, steps = 1)
 

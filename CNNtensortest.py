@@ -178,15 +178,15 @@ output_dir = '/Users/clementmanger/Desktop/Thesis/Tensorflow/TFCNN'
 
 cnn = tf.estimator.Estimator(model_fn=cnn_model, config=tflearn.RunConfig(model_dir=output_dir))
 
-cnn.train(input_fn=train_input_fn, steps = 500)
+cnn.train(input_fn=train_input_fn, steps = 300)
 
-ev = cnn.evaluate(input_fn=eval_input_fn, steps = 5)
-
-pred = cnn.predict(input_fn=eval_input_fn)
-
-for i, p in enumerate(pred):
-
-    print("Prediction %s: %s" % (i + 1, p["prob"]))
+# ev = cnn.evaluate(input_fn=eval_input_fn, steps = 5)
+#
+# pred = cnn.predict(input_fn=eval_input_fn)
+#
+# for i, p in enumerate(pred):
+#
+#     print("Prediction %s: %s" % (i + 1, p["prob"]))
 
 
 # print('hooray')

@@ -84,16 +84,16 @@ numbers = table2.lookup(densewords)
 padding = tf.constant([[0,0],[0,MAX_DOCUMENT_LENGTH]])
 padded = tf.pad(numbers, padding)
 sliced = tf.slice(padded, [0,0], [-1, MAX_DOCUMENT_LENGTH])
-shaped = tf.reshape(sliced, [1735])
+shaped = tf.reshape(sliced, [MAX_DOCUMENT_LENGTH])
 # shaped = tf.expand_dims(shaped, -1)
 
-batch_size = file_len(filename)
-min_after_dequeue = 10000
-capacity = min_after_dequeue + 3 * batch_size
+# batch_size = file_len(filename)
+# min_after_dequeue = 10000
+# capacity = min_after_dequeue + 3 * batch_size
 
-example_batch, label_batch = tf.train.shuffle_batch(
-  [shaped, labels], batch_size=batch_size, capacity=capacity,
-  min_after_dequeue=min_after_dequeue)
+# example_batch, label_batch = tf.train.shuffle_batch(
+#   [shaped, labels], batch_size=batch_size, capacity=capacity,
+#   min_after_dequeue=min_after_dequeue)
 
 import numpy
 numpy.set_printoptions(threshold=numpy.nan)
@@ -113,7 +113,7 @@ with tf.Session() as sess:
     # print(tf.squeeze(labels).shape)
 
     #THIS READS FROM THE SAME
-        print(sess.run([shaped]))
+        print(sess.run([sliced, shaped]))
 
     #THESE READ FROM DIFFERENT ONES
     # print(densewords.shape)
