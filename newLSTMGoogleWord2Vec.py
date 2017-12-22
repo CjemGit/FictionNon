@@ -1,7 +1,7 @@
 import os
 
 cwd = os.getcwd()
-os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
+os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data')
 
 import pandas as pd
 import numpy as np
@@ -17,8 +17,17 @@ from tensorflow.contrib import lookup
 from tensorflow.python.platform import gfile
 import re
 import csv
+#
+# df = pd.read_csv('clemrevs.csv', sep = '|', header=0)
+#
+# df = df[df['fiction'].notnull()]
+#
+# df = df[df.columns[1:]]
+#
+# df.to_csv('ReviewsFiction.csv', sep='|', index=False)
 
-df = pd.DataFrame.from_csv('ReviewsFiction.csv', sep = '|', header=0)
+df = pd.read_csv('ReviewsFiction.csv', sep = '|', header=0)
+
 
 def cleanstring(string):
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
@@ -46,28 +55,27 @@ def cleanSentences(string):
     return re.sub(strip_special_chars, "", string.lower())
 
 #writes each review as seperate .txt file
+
+sample = round(len(df)/10)
+#
+# train = df[sample:]
+#
+# test = df[:sample]
+
+#train and test is done by taking a wedge from the middle of the split between fiction and non ficiton
+
 num = 1
 
 for row in df.iterrows():
     if row[1][1] == True:
-        os.chdir('/Users/clementmanger/Desktop/Thesis/Data/Fiction')
+        os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\Fiction')
         with open(str(num) + "fiction.txt", "w", encoding='utf8') as text_file:
             text_file.write(row[1][0])
     else:
-        os.chdir('/Users/clementmanger/Desktop/Thesis/Data/NonFiction')
+        os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\NonFiction')
         with open(str(num) + "nonfiction.txt", "w", encoding='utf8') as text_file:
             text_file.write(row[1][0])
     num = num + 1
-
-#load vectors
-#
-# firstSentence = np.zeros((8), dtype='int32')
-# firstSentence[0] = vocab.index("as")
-# firstSentence[1] = vocab.index("with")
-# firstSentence[2] = vocab.index("most")
-# firstSentence[3] = vocab.index("of")
-# firstSentence[4] = vocab.index("her")
-# firstSentence[5] = vocab.index("books")
 
 length = []
 for f in df['Review Text']:
@@ -82,7 +90,7 @@ MAX_DOCUMENT_LENGTH = max(length)
 vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(MAX_DOCUMENT_LENGTH)
 vocab_processor.fit(lines)
 
-os.chdir('/Users/clementmanger/Desktop/Thesis/Data')
+os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data')
 
 # write vocab to directory
 with gfile.Open('vocab.tsv', 'wb') as f:
@@ -174,9 +182,9 @@ def load_embedding_vectors_word2vec(vocabulary, filename, binary):
 from os import listdir
 from os.path import isfile, join
 FictionFiles = ['Fiction/' + f for f in listdir('Fiction/') if isfile(join('Fiction/', f))]
-FictionFiles.remove('Fiction/.DS_Store')
+# FictionFiles.remove('Fiction/.DS_Store')
 NonFictionFiles = ['NonFiction/' + f for f in listdir('NonFiction/') if isfile(join('NonFiction/', f))]
-NonFictionFiles.remove('NonFiction/.DS_Store')
+# NonFictionFiles.remove('NonFiction/.DS_Store')
 
 numWords = []
 
@@ -253,30 +261,30 @@ def getTrainBatch():
     arr = np.zeros([batchSize, maxSeqLength])
     for i in range(batchSize):
         if (i % 2 == 0):
-            num = randint(1,fictioncounter)
+            num = randint(1,fictioncounter-(sample/2))
             labels.append([1,0])
         else:
-            num = randint(fictioncounter+1,fileCounter)
+            num = randint(fictioncounter+(sample/2),fileCounter)
             labels.append([0,1])
         arr[i] = ids[num-1:num]
     return arr, labels
 
-# def getTestBatch():
-#     labels = []
-#     arr = np.zeros([batchSize, maxSeqLength])
-#     for i in range(batchSize):
-#         num = randint(11499,13499)
-#         if (num <= 12499):
-#             labels.append([1,0])
-#         else:
-#             labels.append([0,1])
-#         arr[i] = ids[num-1:num]
-#     return arr, labels
+def getTestBatch():
+    labels = []
+    arr = np.zeros([batchSize, maxSeqLength])
+    for i in range(batchSize):
+        num = randint((fictioncounter-(sample/2)+1),(fictioncounter+(sample/2)-1))
+        if (num <= fictioncounter):
+            labels.append([1,0])
+        else:
+            labels.append([0,1])
+        arr[i] = ids[num-1:num]
+    return arr, labels
 
 batchSize = 24
 lstmUnits = 64
 numClasses = 2
-iterations = 100000
+iterations = 1001
 numDimensions = 300
 
 import tensorflow as tf
@@ -288,60 +296,24 @@ input_data = tf.placeholder(tf.int32, [batchSize, maxSeqLength])
 data = tf.Variable(tf.zeros([batchSize, maxSeqLength, numDimensions]),dtype=tf.float32)
 # data = tf.cast(data, tf.float64)
 import numpy as np
-# wordVectors = load_embedding_vectors_word2vec(vocabulary, '/Users/clementmanger/Desktop/Thesis/Data/GoogleNews-vectors-negative300.bin', True)
-wordVectors2 = np.load('wordVectors.npy')
+wordVectors = load_embedding_vectors_word2vec(vocabulary, 'C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\GoogleNews-vectors-negative300.bin', True)
 
-#
-# len(wordVectors2)
-#
-# wordVectors2.shape
-#
-#
-# filvec = wordVectors[0]
-#
-# filvec.shape
-#
-# len(wordVectors[0])
-#
-# len(wordVectors[0][0])
-#
-#
-#
-#
-# len(filvec)
-# # #weird difference here
-# len(vocab)
-#
-# len(ids[1)
-#
-# np.amax(ids)
-#
-# filvec[2]
-
-#
-# type(filvec)
-# type(wordVectors2)
-#
-# V = tf.Variable(tf.random_uniform([len(vocab), 300], -1.0, 1.0),name="W")
-# #
-# V.assign(filvec)
-
-data = tf.nn.embedding_lookup(wordVectors2, input_data)
+data = tf.nn.embedding_lookup(wordVectors, input_data)
 
 lstmCell = tf.contrib.rnn.BasicLSTMCell(lstmUnits)
 lstmCell = tf.contrib.rnn.DropoutWrapper(cell=lstmCell, output_keep_prob=0.75)
-value, _ = tf.nn.dynamic_rnn(lstmCell, data, dtype=tf.float32)
+value, _ = tf.nn.dynamic_rnn(lstmCell, data, dtype=tf.float64)
 
 weight = tf.Variable(tf.truncated_normal([lstmUnits, numClasses]), dtype=tf.float32)
-# weight = tf.cast(weight, tf.float64)
+weight = tf.cast(weight, tf.float64)
 bias = tf.Variable(tf.constant(0.1, shape=[numClasses]))
-# bias = tf.cast(bias, tf.float64)
+bias = tf.cast(bias, tf.float64)
 value = tf.transpose(value, [1, 0, 2])
 last = tf.gather(value, int(value.get_shape()[0]) - 1)
 prediction = (tf.matmul(last, weight) + bias)
 
 correctPred = tf.equal(tf.argmax(prediction,1), tf.argmax(labels,1))
-accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
+accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float64))
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
 optimizer = tf.train.AdamOptimizer().minimize(loss)
@@ -351,7 +323,7 @@ import datetime
 tf.summary.scalar('Loss', loss)
 tf.summary.scalar('Accuracy', accuracy)
 merged = tf.summary.merge_all()
-logdir = "tensorboard/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "/"
+logdir = 'C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\gw2v'
 
 sess = tf.InteractiveSession()
 writer = tf.summary.FileWriter(logdir, sess.graph)
@@ -369,9 +341,20 @@ for i in range(iterations):
        summary = sess.run(merged, {input_data: nextBatch, labels: nextBatchLabels})
        writer.add_summary(summary, i)
 
-   #Save the network every 10,000 training iterations
-   if (i % 10000 == 0 and i != 0):
-       save_path = saver.save(sess, "'/Users/clementmanger/Desktop/Thesis/Example'", global_step=i)
+   #Save the network every 1000 training iterations
+   if (i % 1000 == 0 and i != 0):
+       save_path = saver.save(sess, logdir, global_step=i)
        print("saved to %s" % save_path)
 writer.close()
 #suspect the problem is that the vocab starts at 1 rather than 0, problem is with the vocabulary
+
+#
+# sess = tf.InteractiveSession()
+# saver = tf.train.Saver()
+# saver.restore(sess, tf.train.latest_checkpoint('models'))
+#
+#
+# iterations = 10
+# for i in range(iterations):
+#     nextBatch, nextBatchLabels = getTestBatch();
+#     print("Accuracy for this batch:", (sess.run(accuracy, {input_data: nextBatch, labels: nextBatchLabels})) * 100)
