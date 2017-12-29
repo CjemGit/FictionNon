@@ -1,0 +1,24 @@
+{
+  "1":
+  {
+    "Architecture":"LSTM",
+    "Spec":"GoogleW2vLSTM",
+    "rewrite":"True",
+    "maxSeqLength":"400",
+    "batchSize":"48",
+    "lstmUnits":"32",
+    "output_keep_prob":"0.5",
+    "vectorpath":"C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\GoogleNews-vectors-negative300.bin"
+  },
+  "2":
+  {
+    "Architecture":"LSTM",
+    "Spec":"GoogleW2vLSTM2",
+    "rewrite":"True",
+    "maxSeqLength":"450",
+    "batchSize":"24",
+    "lstmUnits":"64",
+    "output_keep_prob":"0.5",
+    "vectorpath":"C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\GoogleNews-vectors-negative300.bin"
+  }
+}

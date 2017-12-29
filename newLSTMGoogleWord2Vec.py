@@ -1,7 +1,7 @@
 import os
-
-cwd = os.getcwd()
+SPEC = 'LSTMGoogleW2Vec'
 os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data')
+cwd = os.getcwd()
 
 import pandas as pd
 import numpy as np
@@ -17,17 +17,8 @@ from tensorflow.contrib import lookup
 from tensorflow.python.platform import gfile
 import re
 import csv
-#
-# df = pd.read_csv('clemrevs.csv', sep = '|', header=0)
-#
-# df = df[df['fiction'].notnull()]
-#
-# df = df[df.columns[1:]]
-#
-# df.to_csv('ReviewsFiction.csv', sep='|', index=False)
 
-df = pd.read_csv('ReviewsFiction.csv', sep = '|', header=0)
-
+df = pd.read_csv('ReviewsFiction.csv', sep = '|', header=0, index_col=0)
 
 def cleanstring(string):
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
@@ -57,25 +48,19 @@ def cleanSentences(string):
 #writes each review as seperate .txt file
 
 sample = round(len(df)/10)
+
+# num = 1
 #
-# train = df[sample:]
-#
-# test = df[:sample]
-
-#train and test is done by taking a wedge from the middle of the split between fiction and non ficiton
-
-num = 1
-
-for row in df.iterrows():
-    if row[1][1] == True:
-        os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\Fiction')
-        with open(str(num) + "fiction.txt", "w", encoding='utf8') as text_file:
-            text_file.write(row[1][0])
-    else:
-        os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\NonFiction')
-        with open(str(num) + "nonfiction.txt", "w", encoding='utf8') as text_file:
-            text_file.write(row[1][0])
-    num = num + 1
+# for row in df.iterrows():
+#     if row[1][1] == True:
+#         os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\Fiction')
+#         with open(str(num) + "fiction.txt", "w", encoding='utf8') as text_file:
+#             text_file.write(row[1][0])
+#     else:
+#         os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\NonFiction')
+#         with open(str(num) + "nonfiction.txt", "w", encoding='utf8') as text_file:
+#             text_file.write(row[1][0])
+#     num = num + 1
 
 length = []
 for f in df['Review Text']:
@@ -92,11 +77,11 @@ vocab_processor.fit(lines)
 
 os.chdir('C:\\Users\\Clembo\\Desktop\\Thesis\\Data')
 
-# write vocab to directory
-with gfile.Open('vocab.tsv', 'wb') as f:
-    # f.write("{}\n".format(PADWORD))
-    for word, index in vocab_processor.vocabulary_._mapping.items():
-      f.write("{}\n".format(word))
+# # write vocab to directory
+# with gfile.Open('vocab.tsv', 'wb') as f:
+#     # f.write("{}\n".format(PADWORD))
+#     for word, index in vocab_processor.vocabulary_._mapping.items():
+#       f.write("{}\n".format(word))
 
 x = np.array(list(vocab_processor.fit_transform(lines)))
 
@@ -214,7 +199,7 @@ maxSeqLength = 300
 ids = np.zeros((numFiles, maxSeqLength), dtype='int32')
 fileCounter = 0
 for ff in FictionFiles:
-   with open(pf, "r") as f:
+   with open(ff, "r") as f:
        indexCounter = 0
        line=f.readline()
        cleanedLine = cleanSentences(line)
@@ -261,30 +246,30 @@ def getTrainBatch():
     arr = np.zeros([batchSize, maxSeqLength])
     for i in range(batchSize):
         if (i % 2 == 0):
-            num = randint(1,fictioncounter-(sample/2))
+            num = randint(1,fictioncounter-(round(sample/2)))
             labels.append([1,0])
         else:
-            num = randint(fictioncounter+(sample/2),fileCounter)
+            num = randint(fictioncounter+(round(sample/2)),fileCounter)
             labels.append([0,1])
         arr[i] = ids[num-1:num]
     return arr, labels
 
-def getTestBatch():
-    labels = []
-    arr = np.zeros([batchSize, maxSeqLength])
-    for i in range(batchSize):
-        num = randint((fictioncounter-(sample/2)+1),(fictioncounter+(sample/2)-1))
-        if (num <= fictioncounter):
-            labels.append([1,0])
-        else:
-            labels.append([0,1])
-        arr[i] = ids[num-1:num]
-    return arr, labels
+# def getTestBatch():
+#     labels = []
+#     arr = np.zeros([batchSize, maxSeqLength])
+#     for i in range(batchSize):
+#         num = randint((fictioncounter-(sample/2)+1),(fictioncounter+(sample/2)-1))
+#         if (num <= fictioncounter):
+#             labels.append([1,0])
+#         else:
+#             labels.append([0,1])
+#         arr[i] = ids[num-1:num]
+#     return arr, labels
 
 batchSize = 24
 lstmUnits = 64
 numClasses = 2
-iterations = 1001
+iterations = 3001
 numDimensions = 300
 
 import tensorflow as tf
@@ -323,14 +308,18 @@ import datetime
 tf.summary.scalar('Loss', loss)
 tf.summary.scalar('Accuracy', accuracy)
 merged = tf.summary.merge_all()
-logdir = 'C:\\Users\\Clembo\\Desktop\\Thesis\\Data\\gw2v'
-
+logdir = "tensorboard/" + SPEC + "/"
 sess = tf.InteractiveSession()
 writer = tf.summary.FileWriter(logdir, sess.graph)
 
 saver = tf.train.Saver()
 sess.run(tf.global_variables_initializer())
 
+import time
+
+timer = pd.DataFrame(columns=['Steps', 'Time'])
+
+t0 = time.time()
 for i in range(iterations):
    #Next Batch of reviews
    nextBatch, nextBatchLabels = getTrainBatch();
@@ -341,20 +330,18 @@ for i in range(iterations):
        summary = sess.run(merged, {input_data: nextBatch, labels: nextBatchLabels})
        writer.add_summary(summary, i)
 
+       t1 = time.time()
+       count = pd.DataFrame(columns=['Steps', 'Time'], data=[[i,(t1-t0)]])
+       timer = timer.append(count)
+
    #Save the network every 1000 training iterations
-   if (i % 1000 == 0 and i != 0):
-       save_path = saver.save(sess, logdir, global_step=i)
+   if (i % 500 == 0 and i != 0):
+       save_path = saver.save(sess, "models/" + SPEC + "/ckpt", global_step=i)
        print("saved to %s" % save_path)
 writer.close()
-#suspect the problem is that the vocab starts at 1 rather than 0, problem is with the vocabulary
 
-#
-# sess = tf.InteractiveSession()
-# saver = tf.train.Saver()
-# saver.restore(sess, tf.train.latest_checkpoint('models'))
-#
-#
-# iterations = 10
-# for i in range(iterations):
-#     nextBatch, nextBatchLabels = getTestBatch();
-#     print("Accuracy for this batch:", (sess.run(accuracy, {input_data: nextBatch, labels: nextBatchLabels})) * 100)
+#cd C:\Users\Clembo\Desktop\Thesis\Data
+#tensorboard --logdir=tensorboard
+
+#http://localhost:6006/
+timer.to_csv('timer.csv')
